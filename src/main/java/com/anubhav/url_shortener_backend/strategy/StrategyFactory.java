@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class StrategyFactory {
@@ -26,6 +27,7 @@ public class StrategyFactory {
     }
 
     public ShortenStrategy getStrategy(String shortKey) {
-        return strategyShortKeyMap.get(shortKey);
+        Optional<Map.Entry<String, ShortenStrategy>> res = strategyShortKeyMap.entrySet().stream().filter(e -> shortKey.startsWith(e.getKey())).findFirst();
+        return res.isPresent() ? res.get().getValue() : null;
     }
 }

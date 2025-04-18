@@ -30,14 +30,18 @@ public class Base62ShortenStrategy implements ShortenStrategy {
 
         // Get a new unique ID by incrementing the counter
         Long newId = redisTemplate.opsForValue().increment(COUNTER_KEY);
-
+        String shortCode = strategyShortKey()+base62Helper.fixed_length_encode(newId, 5);
         // Store the mapping
         redisTemplate.opsForHash().put(URL_HASH_KEY, url, newId.toString());
-        redisTemplate.opsForHash().put(URL_HASH_KEY + ":reverse",
-                base62Helper.encode(newId), url);
+        redisTemplate.opsForHash().put(URL_HASH_KEY + ":reverse", shortCode, url);
 
         // Convert the ID to Base62 and return
-        return base62Helper.encode(newId);
+        return shortCode;
+    }
+
+    @Override
+    public String expand(String shortCode) {
+        return (String) redisTemplate.opsForHash().get(URL_HASH_KEY + ":reverse", shortCode);
     }
 
     @Override
